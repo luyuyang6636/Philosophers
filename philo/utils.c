@@ -12,12 +12,18 @@
 
 #include "philo.h"
 
-void	ft_handle_error(char *error_msg)
+int	ft_strncmp(const char *s1, const char *s2, size_t n)
 {
-	write(STDERR_FILENO, "Error: ", 7);
-	write(STDERR_FILENO, error_msg, ft_strlen(error_msg));
-	write(STDERR_FILENO, "\n", 1);
-	exit(EXIT_FAILURE);
+	if (!s1 || !s2)
+		return (1);
+	if (n == 0)
+		return (0);
+	while (--n && *s1 && *s2 && *s1 == *s2)
+	{
+		s1++;
+		s2++;
+	}
+	return (*s1 - *s2);
 }
 
 int	ft_atoi(char *str)
@@ -33,4 +39,22 @@ int	ft_atoi(char *str)
 		str++;
 	}
 	return (n);
+}
+
+u_int64_t	get_time(void)
+{
+	struct timeval	time;
+
+	if (gettimeofday(&time, NULL))
+		ft_handle_error("Failure to get time of day!", NULL);
+	return (time.tv_sec * 1000 + time.tv_usec / 1000);
+}
+
+void	ft_usleep(uint64_t time)
+{
+	uint64_t	start;
+
+	start = get_time();
+	while ((get_time() - start) < time)
+		usleep(time / 10);
 }

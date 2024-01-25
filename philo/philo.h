@@ -21,20 +21,24 @@
 # include <inttypes.h>
 # include <sys/time.h>
 
-
+# define DEAD_MSG	"is dead."
 
 typedef struct	s_data
 {
 	pthread_t	*tid;
 	t_philo		*philos;
 	pthread_mutex_t	*forks;
+	pthread_mutex_t	write;
+	pthread_mutex_t	lock;
 	uint64_t	dur_die;
 	uint64_t	dur_eat;
 	uint64_t	dur_sleep;
+	uint64_t	start_time;
 	int		n_philo;
 	int		eat_goal;
 	int		fini;
-}	t_data;
+	int		dead;
+}	t_data; 
 
 typedef struct	s_philo
 {
@@ -50,10 +54,21 @@ typedef struct	s_philo
 	
 }	t_philo;
 
-void	ft_handle_error(char *error_msg);
-void	ft_check_input(char **argv);
-void	ft_init_data(t_data *data, char **argv);
-void	ft_init(t_data *data, char **argv);
+int		ft_handle_error(char *error_msg, t_data *data);
+int		ft_check_input(char **argv);
+int		ft_init_data(t_data *data, char **argv);
+int		ft_init(t_data *data, char **argv);
+int		ft_init_array(t_data *data);
 int		ft_atoi(char *str);
+int		ft_strncmp(const char *s1, const char *s2, size_t n);
+u_int64_t	get_time(void);
+void	ft_init_forks(t_data *data);
+void	ft_init_philos(t_data *data);
+void	ft_free_data(t_data *data);
+void	ft_exit(t_data *data);
+void	message(t_philo *philo, char *msg);
+void	ft_usleep(uint64_t time);
+
+
 
 # endif
