@@ -51,7 +51,7 @@ int	ft_init_data(t_data *data, char **argv)
 	data->dur_die = ft_atoi(argv[2]);
 	data->dur_eat = ft_atoi(argv[3]);
 	data->dur_sleep = ft_atoi(argv[4]);
-	if (*argv[5])
+	if (argv[5])
 		data->eat_goal = ft_atoi(argv[5]);
 	else
 		data->eat_goal = -1;

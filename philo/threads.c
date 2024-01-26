@@ -1,6 +1,6 @@
 #include "philo.h"
 
-void	monitor(void *pdata)
+void	*monitor(void *pdata)
 {
 	t_data	*data;
 
@@ -9,11 +9,12 @@ void	monitor(void *pdata)
 	while (data->dead == 0)
 	{
 		if (data->fini >= data->n_philo)
-			data->dead = 0;
+			data->dead = 1;
 	}
+	return ((void *)0);
 }
 
-void	supervisor(void *p)
+void	*supervisor(void *p)
 {
 	t_philo	*philo;
 
@@ -21,22 +22,38 @@ void	supervisor(void *p)
 	while (!philo->data->dead)
 	{
 		pthread_mutex_lock(&philo->lock);
-		if (get_time() >= philo->time_to_die)
+		if (get_time() >= philo->time_to_die && !philo->eating)
 			message(philo, DEAD_MSG);
+		if (philo->eat_count == philo->data->eat_goal)
+		{
+			pthread_mutex_lock(&philo->data->lock);
+			philo->data->fini++;
+			pthread_mutex_unlock(&philo->data->lock);
+			philo->eat_count++;
+		}
+		
 	}
+	return ((void *)0);
 }
 
-void	routine(void *p)
+void	*routine(void *p)
 {
 	t_philo	*philo;
 
 	philo = (t_philo *)p;
 	if (pthread_create(&philo->th, NULL, &supervisor, &philo))
-		return (ft_handle_error("supervisor thread failed!", philo->data));
+	{
+		ft_handle_error("supervisor thread failed!", philo->data);
+		return ((void *)1);
+	}
 	while (philo->data->dead == 0)
 	{
 		eat(philo);
+		message(philo, THINK_MSG);
 	}
+	if (pthread_join(philo->th, NULL))
+		return ((void *)1);
+	return (NULL);
 }
 
 int	ft_thread(t_data *data)
@@ -57,9 +74,13 @@ int	ft_thread(t_data *data)
 			return (ft_handle_error("routine thread failed!", data));
 	}
 	i = -1;
+	while (++i < data->n_philo)
+	{
+		if (pthread_join(data->tid[i], NULL))
+			return (1);
+	}
+	return (0);
 
-		if (pthread_create(&data->tid[i], NULL, &supervisor, &data->philos[i]))
-			return (ft_handle_error("supervisor thread failed!", data));
 
 
 }

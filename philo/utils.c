@@ -12,6 +12,18 @@
 
 #include "philo.h"
 
+int	ft_strlen(char *s)
+{
+	int	i;
+
+	i = 0;
+	if (!s)
+		return (0);
+	while (*s++)
+		i++;
+	return (i);
+}
+
 int	ft_strncmp(const char *s1, const char *s2, size_t n)
 {
 	if (!s1 || !s2)
@@ -35,7 +47,7 @@ int	ft_atoi(char *str)
 		str++;
 	while (*str >= 48 && *str <= 57)
 	{
-		n = n * 10 + *str;
+		n = n * 10 + *str - 48;
 		str++;
 	}
 	return (n);

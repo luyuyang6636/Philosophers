@@ -15,17 +15,19 @@
 int	ft_check_input(char **argv)
 {
 	int	i;
+	int	j;
 
 	i = 1;
 	while (argv[i])
 	{
-		while (*argv[i] && *argv[i] == ' ')
-			argv[i]++;
-		while (*argv[i])
+		j = 0;
+		if (argv[i][j] && argv[i][j] == ' ')
+			j++;
+		while (argv[i][j])
 		{
-			if (*argv[i] < 48 || *argv[i] > 57)
+			if (argv[i][j] < 48 || argv[i][j] > 57)
 				return (ft_handle_error("Input are not all integers", NULL));
-			argv[i]++;
+			j++;
 		}
 		i++;
 	}
@@ -54,7 +56,7 @@ void	ft_exit(t_data *data)
 	}
 	pthread_mutex_destroy(&data->write);
 	pthread_mutex_destroy(&data->lock);
-	ft_free_data(&data);
+	ft_free_data(data);
 }
 
 int	ft_handle_error(char *error_msg, t_data *data)
@@ -71,14 +73,20 @@ int	main(int argc, char **argv)
 {
 	t_data	data;
 
-	if (argc == 4 || argc == 5)
+	if (argc != 5 && argc != 6)
+		return (1);
+	if (ft_check_input(argv))
+		return (1);
+	if (ft_init(&data, argv))
+		return (1);
+	if (data.n_philo == 1)
 	{
-		if (ft_check_input(argv))
-			return (1);
-		if (ft_init(&data, argv))
-			return (1);
-		if (ft_thread(&data))
-			return (1);
+		message(&data.philos[0], FORK_MSG);
+		ft_usleep(data.dur_sleep);
+		message(&data.philos[0], DEAD_MSG);
 	}
+	if (ft_thread(&data))
+		return (1);
+	ft_exit(&data);
 	return (0);
 }
