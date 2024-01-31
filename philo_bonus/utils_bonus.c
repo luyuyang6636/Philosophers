@@ -65,10 +65,8 @@ void	message(t_philo *philo, char *msg)
 	
 	time = get_time() - philo->data->start_time;
 	sem_wait(philo->data->message);
-	if (philo->data->dead == 0 && ft_strncmp(msg, DEAD_MSG, 5))
-		printf("%lu %d %s", time, philo->id, msg);
-	else if (philo->data->dead == 0)
-		printf("%lu %d %s", time, philo->id, msg);
-	sem_post(philo->data->message);
+	printf("%llu %d %s\n", time, philo->id, msg);
+	if (ft_strncmp(msg, DEAD_MSG, 5))
+		sem_post(philo->data->message);
 }
 	

@@ -51,10 +51,7 @@ void	ft_clean(t_data *data)
 	if (data->philos)
 	{
 		while (++i < data->n_philo)
-		{
-			if (data->philos[i].pid == 0)
-				kill(data->philos[i].pid, SIGKILL);
-		}
+			kill(data->philos[i].pid, SIGKILL);
 		free (data->philos);
 	}
 	sem_close(data->fork);

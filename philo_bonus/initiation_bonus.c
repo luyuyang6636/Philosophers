@@ -29,7 +29,6 @@ void	ft_init_data(t_data *data, char **argv)
 	sem_unlink("stop");
 	sem_unlink("dead");
 	sem_unlink("change");
-	printf("%d\n", data->n_philo);
 	data->fork = sem_open("fork", O_CREAT, 0600, data->n_philo);
 	data->message = sem_open("message", O_CREAT, 0600, 1);
 	data->stop = sem_open("stop", O_CREAT, 0600, 1);
@@ -51,6 +50,7 @@ void	ft_init_philos(t_data *data)
 		data->philos[i].eating = 0;
 		data->philos[i].time_to_die = get_time() + data->dur_death;
 		data->philos[i].eat_count = 0;
+		data->philos[i].data = data;
 	}
 }
 

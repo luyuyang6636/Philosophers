@@ -19,6 +19,7 @@ void	*monitor(void *p)
 	data = (t_data *)p;
 	while (1)
 	{
+//		printf("%d %d\n", data->fini, data->eat_goal);
 		if (data->fini >= data->n_philo)
 		{
 			sem_post(data->stop);
@@ -31,20 +32,24 @@ void	*monitor(void *p)
 
 void	eat(t_philo *philo)
 {
+	
 	sem_wait(philo->data->fork);
-	printf("%d\n", 1);
 	message(philo, FORK_MSG);
 	sem_wait(philo->data->fork);
 	message(philo, FORK_MSG);
 	philo->eating = 1;
 	philo->eat_count++;
+//	printf("%d\n", philo->eat_count);
 	philo->time_to_die = get_time() + philo->data->dur_death;
 	message(philo, EAT_MSG);
-	ft_usleep(philo->data->dur_eat);
+//	ft_usleep(philo->data->dur_eat);
+	usleep(philo->data->dur_eat * 1000);
+	philo->eating = 0;
 	sem_post(philo->data->fork);
 	sem_post(philo->data->fork);
 	message(philo, SLEEP_MSG);
-	ft_usleep(philo->data->dur_sleep);
+	usleep(philo->data->dur_sleep * 1000);
+//	ft_usleep(philo->data->dur_sleep);
 }
 
 void	*supervisor(void *p)
@@ -52,20 +57,27 @@ void	*supervisor(void *p)
 	t_philo	*philo;
 	
 	philo = (t_philo *)p;
+//	printf("%d\n", philo->data->eat_goal);
+//	exit(0);
 	while (1)
 	{
-		if (get_time() >= philo->time_to_die)
+		if (get_time() >= philo->time_to_die && philo->eating == 0)
 		{
 			sem_wait(philo->data->dead);
 			message(philo, DEAD_MSG);
-			sem_post(philo->data->stop);
+			sem_post(philo->data->stop); 
 			break;
 		}
-		if ( philo->data->eat_goal != -1
-			&& philo->eat_count == philo->data->eat_goal)
+//		printf("%d\n", philo->eat_count);
+//		usleep(100000);
+		if (philo->data->eat_goal != -1 && philo->eat_count == philo->data->eat_goal)
 		{
+//			printf("%d\n", philo->eat_count);
+//			exit(0);
 			sem_wait(philo->data->change);
 			philo->data->fini++;
+			if (philo->data->fini >= philo->data->n_philo)
+				sem_post(philo->data->stop);
 			sem_post(philo->data->change);
 			philo->eat_count++;
 		}
@@ -108,6 +120,5 @@ void	ft_processes(t_data *data)
 			routine(&data->philos[i]);	
 			exit(0);
 		}
-		ft_usleep(100);
 	}
 }
