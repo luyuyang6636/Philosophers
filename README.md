@@ -1,4 +1,11 @@
 # The infamous Dining Philosophers problem
+### How to test it?
+Simply `git clone` the repository, go into the `philo` directory for implementation with threads and mutexes, and go into the `philo_bonus` directory for implementation with processes and semaphores. 
+
+Use Makefile command `make` for both directory. Once the executable is compiled, simply run the program with the 4/5 arguments specified below (for example, `./philo 15 800 200 200 3`)
+
+Enjoy :))
+
 ### What is the problem?
 _**General rules**_
 
