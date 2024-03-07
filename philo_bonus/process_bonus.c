@@ -14,77 +14,64 @@
 
 void	*monitor(void *p)
 {
-	t_data *data;
-	
+	t_data	*data;
+
 	data = (t_data *)p;
 	while (1)
 	{
-//		printf("%d %d\n", data->fini, data->eat_goal);
+		sem_wait(data->change);
+		data->fini++;
 		if (data->fini >= data->n_philo)
 		{
+			message(&data->philos[0], FINI_MSG);
 			sem_post(data->stop);
-			break;
+			break ;
 		}
 	}
 	return (NULL);
 }
-		
 
 void	eat(t_philo *philo)
 {
-	
 	sem_wait(philo->data->fork);
 	message(philo, FORK_MSG);
 	sem_wait(philo->data->fork);
 	message(philo, FORK_MSG);
 	philo->eating = 1;
 	philo->eat_count++;
-//	printf("%d\n", philo->eat_count);
 	philo->time_to_die = get_time() + philo->data->dur_death;
 	message(philo, EAT_MSG);
-//	ft_usleep(philo->data->dur_eat);
-	usleep(philo->data->dur_eat * 1000);
+	ft_usleep(philo->data->dur_eat);
 	philo->eating = 0;
 	sem_post(philo->data->fork);
 	sem_post(philo->data->fork);
 	message(philo, SLEEP_MSG);
-	usleep(philo->data->dur_sleep * 1000);
-//	ft_usleep(philo->data->dur_sleep);
+	ft_usleep(philo->data->dur_sleep);
 }
 
 void	*supervisor(void *p)
 {
 	t_philo	*philo;
-	
+
 	philo = (t_philo *)p;
-//	printf("%d\n", philo->data->eat_goal);
-//	exit(0);
 	while (1)
 	{
 		if (get_time() >= philo->time_to_die && philo->eating == 0)
 		{
 			sem_wait(philo->data->dead);
 			message(philo, DEAD_MSG);
-			sem_post(philo->data->stop); 
-			break;
+			sem_post(philo->data->stop);
+			break ;
 		}
-//		printf("%d\n", philo->eat_count);
-//		usleep(100000);
-		if (philo->data->eat_goal != -1 && philo->eat_count == philo->data->eat_goal)
+		if (philo->data->eat_goal != -1
+			&& philo->eat_count == philo->data->eat_goal)
 		{
-//			printf("%d\n", philo->eat_count);
-//			exit(0);
-			sem_wait(philo->data->change);
-			philo->data->fini++;
-			if (philo->data->fini >= philo->data->n_philo)
-				sem_post(philo->data->stop);
 			sem_post(philo->data->change);
 			philo->eat_count++;
 		}
 	}
 	return (NULL);
 }
-
 
 void	routine(t_philo *philo)
 {
@@ -98,14 +85,15 @@ void	routine(t_philo *philo)
 	{
 		eat(philo);
 		message(philo, THINK_MSG);
+		usleep (200);
 	}
 }
 
 void	ft_processes(t_data *data)
 {
-	int		i;
+	int			i;
 	pthread_t	mon;
-	
+
 	i = -1;
 	if (data->eat_goal > 0)
 	{
@@ -117,8 +105,8 @@ void	ft_processes(t_data *data)
 		data->philos[i].pid = fork();
 		if (data->philos[i].pid == 0)
 		{
-			routine(&data->philos[i]);	
-			exit(0);
+			routine(&data->philos[i]);
 		}
+		usleep(100);
 	}
 }

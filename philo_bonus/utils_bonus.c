@@ -62,11 +62,13 @@ int	ft_strncmp(const char *s1, const char *s2, size_t n)
 void	message(t_philo *philo, char *msg)
 {
 	uint64_t	time;
-	
+
 	time = get_time() - philo->data->start_time;
 	sem_wait(philo->data->message);
-	printf("%llu %d %s\n", time, philo->id, msg);
-	if (ft_strncmp(msg, DEAD_MSG, 5))
+	if (!ft_strncmp(msg, FINI_MSG, 20))
+		printf("%lu %s\n", time, msg);
+	else
+		printf("%lu %d %s\n", time, philo->id, msg);
+	if (ft_strncmp(msg, DEAD_MSG, 5) && ft_strncmp(msg, FINI_MSG, 20))
 		sem_post(philo->data->message);
 }
-	

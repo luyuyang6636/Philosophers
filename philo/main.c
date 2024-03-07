@@ -23,6 +23,8 @@ int	ft_check_input(char **argv)
 		j = 0;
 		if (argv[i][j] && argv[i][j] == ' ')
 			j++;
+		if (argv[i][j] == '-')
+			return (ft_handle_error("Negative input", NULL));
 		while (argv[i][j])
 		{
 			if (argv[i][j] < 48 || argv[i][j] > 57)
@@ -51,8 +53,10 @@ void	ft_exit(t_data *data)
 	i = -1;
 	while (++i < data->n_philo)
 	{
-		pthread_mutex_destroy(&data->forks[i]);
-		pthread_mutex_destroy(&data->philos[i].lock);
+		if (data->forks)
+			pthread_mutex_destroy(&data->forks[i]);
+		if (data->philos)
+			pthread_mutex_destroy(&data->philos[i].lock);
 	}
 	pthread_mutex_destroy(&data->write);
 	pthread_mutex_destroy(&data->lock);
@@ -61,9 +65,7 @@ void	ft_exit(t_data *data)
 
 int	ft_handle_error(char *error_msg, t_data *data)
 {
-	write(STDERR_FILENO, "Error: ", 7);
-	write(STDERR_FILENO, error_msg, ft_strlen(error_msg));
-	write(STDERR_FILENO, "\n", 1);
+	printf("Error: %s\n", error_msg);
 	if (data)
 		ft_exit(data);
 	return (1);
@@ -82,7 +84,7 @@ int	main(int argc, char **argv)
 	if (data.n_philo == 1)
 	{
 		message(&data.philos[0], FORK_MSG);
-		ft_usleep(data.dur_sleep);
+		ft_usleep(data.dur_die);
 		message(&data.philos[0], DEAD_MSG);
 	}
 	if (ft_thread(&data))

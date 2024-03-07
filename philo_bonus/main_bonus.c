@@ -46,7 +46,7 @@ void	ft_handle_error(char *error_msg, t_data *data)
 void	ft_clean(t_data *data)
 {
 	int	i;
-	
+
 	i = -1;
 	if (data->philos)
 	{
@@ -64,7 +64,7 @@ void	ft_clean(t_data *data)
 int	main(int argc, char **argv)
 {
 	t_data	data;
-	
+
 	if (argc != 5 && argc != 6)
 		return (1);
 	ft_check_input(argv);

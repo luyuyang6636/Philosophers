@@ -12,18 +12,6 @@
 
 #include "philo.h"
 
-int	ft_strlen(char *s)
-{
-	int	i;
-
-	i = 0;
-	if (!s)
-		return (0);
-	while (*s++)
-		i++;
-	return (i);
-}
-
 int	ft_strncmp(const char *s1, const char *s2, size_t n)
 {
 	if (!s1 || !s2)
@@ -41,7 +29,7 @@ int	ft_strncmp(const char *s1, const char *s2, size_t n)
 int	ft_atoi(char *str)
 {
 	uint64_t	n;
-	
+
 	n = 0;
 	while (*str == ' ')
 		str++;
@@ -53,13 +41,13 @@ int	ft_atoi(char *str)
 	return (n);
 }
 
-u_int64_t	get_time(void)
+uint64_t	get_time(void)
 {
 	struct timeval	time;
 
 	if (gettimeofday(&time, NULL))
 		ft_handle_error("Failure to get time of day!", NULL);
-	return (time.tv_sec * 1000 + time.tv_usec / 1000);
+	return (time.tv_sec * (uint64_t)1000 + time.tv_usec / 1000);
 }
 
 void	ft_usleep(uint64_t time)
@@ -69,4 +57,27 @@ void	ft_usleep(uint64_t time)
 	start = get_time();
 	while ((get_time() - start) < time)
 		usleep(time / 10);
+}
+
+void	message(t_philo *philo, char *msg)
+{
+	pthread_mutex_lock(&philo->data->write);
+	if (!philo->data->dead && !ft_strncmp(msg, DEAD_MSG, 5))
+	{
+		printf("%lu ", (get_time() - philo->data->start_time));
+		printf("%d %s\n", philo->id, msg);
+		philo->data->dead = 1;
+	}
+	else if (!philo->data->dead && !ft_strncmp(msg, FINI_MSG, 20))
+	{
+		printf("%lu ", (get_time() - philo->data->start_time));
+		printf("%s\n", msg);
+		philo->data->dead = 1;
+	}
+	if (!philo->data->dead)
+	{
+		printf("%lu ", (get_time() - philo->data->start_time));
+		printf("%d %s\n", philo->id, msg);
+	}
+	pthread_mutex_unlock(&philo->data->write);
 }

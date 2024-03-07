@@ -29,12 +29,12 @@ int	ft_init_array(t_data *data)
 void	ft_init_forks(t_data *data)
 {
 	int	i;
-	
+
 	i = 0;
 	while (i < data->n_philo)
 	{
 		pthread_mutex_init(&data->forks[i], NULL);
-		if(i != 0)
+		if (i != 0)
 		{
 			data->philos[i].r_fork = &data->forks[i];
 			data->philos[i].l_fork = &data->forks[i - 1];
@@ -55,11 +55,11 @@ int	ft_init_data(t_data *data, char **argv)
 		data->eat_goal = ft_atoi(argv[5]);
 	else
 		data->eat_goal = -1;
-	if (data->n_philo < 1 || data->dur_die < 0 || data->dur_eat < 0
-		|| data->dur_sleep < 0)
+	if (data->n_philo < 1)
 		return (1);
 	data->fini = 0;
 	data->dead = 0;
+	data->start_time = get_time();
 	pthread_mutex_init(&data->lock, NULL);
 	pthread_mutex_init(&data->write, NULL);
 	return (0);
@@ -68,21 +68,19 @@ int	ft_init_data(t_data *data, char **argv)
 void	ft_init_philos(t_data *data)
 {
 	int	i;
-	
+
 	i = 0;
 	while (i < data->n_philo)
 	{
 		data->philos[i].id = i + 1;
 		data->philos[i].data = data;
-		data->philos[i].time_to_die = data->dur_die;
+		data->philos[i].time_to_die = get_time() + data->dur_die;
 		data->philos[i].eat_count = 0;
 		data->philos[i].eating = 0;
 		pthread_mutex_init(&data->philos[i].lock, NULL);
-        i++;
-    }
+		i++;
+	}
 }
-	
-	
 
 int	ft_init(t_data *data, char **argv)
 {
